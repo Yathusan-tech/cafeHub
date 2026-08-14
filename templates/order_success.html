@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}CafeHub - Order Confirmed{% endblock %}
+{% block content %}
+
+<section style="padding-top:40px;">
+  <div class="container container-narrow" style="max-width:760px;">
+    <div class="order-success-box">
+      <div class="check-icon">✅</div>
+      <h2>ORDER PLACED SUCCESSFULLY!</h2>
+      <p class="text-muted">Thank you, {{ order['customer_name'] }}! Your order is being prepared.</p>
+      <div class="order-number-box">{{ order['order_number'] }}</div>
+
+      <div class="row text-start mt-4 g-3">
+        <div class="col-md-6">
+          <strong>Customer Name:</strong> {{ order['customer_name'] }}
+        </div>
+        <div class="col-md-6">
+          <strong>Table Number:</strong> {{ order['table_number'] }}
+        </div>
+        <div class="col-md-6">
+          <strong>Order Date/Time:</strong> {{ order['created_at'] }}
+        </div>
+        <div class="col-md-6">
+          <strong>Order Status:</strong>
+          <span class="status-badge status-{{ order['status'] }}">{{ order['status'] }}</span>
+        </div>
+      </div>
+
+      <hr class="my-4">
+
+      <h5 class="text-start mb-3">Ordered Items</h5>
+      <table class="table table-cafe text-start">
+        <thead>
+          <tr><th>Item</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr>
+        </thead>
+        <tbody>
+          {% for oi in order_items %}
+          <tr>
+            <td>{{ oi['item_name'] }}</td>
+            <td>{{ oi['quantity'] }}</td>
+            <td>₹{{ '%.0f' % oi['price'] }}</td>
+            <td>₹{{ '%.0f' % (oi['price'] * oi['quantity']) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="text-end fw-bold fs-5 mb-4">
+        Total Amount: ₹{{ '%.0f' % order['total_amount'] }}
+      </div>
+
+      <a href="{{ url_for('menu') }}" class="btn-cafe">Order More</a>
+      <a href="{{ url_for('index') }}" class="btn-cafe-outline ms-2">Back to Home</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

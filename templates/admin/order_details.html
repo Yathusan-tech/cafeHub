@@ -1,0 +1,62 @@
+{% extends "admin/admin_base.html" %}
+{% block title %}Order Details - CafeHub Admin{% endblock %}
+{% block admin_content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 style="color:var(--coffee-brown); font-weight:800;">Order Details</h2>
+  <a href="{{ url_for('admin_orders') }}" class="btn-cafe-outline">&larr; Back to Orders</a>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="table-cafe p-3 mb-4">
+      <h5 class="p-2">Customer Information</h5>
+      <div class="p-2">
+        <p><strong>Order Number:</strong> {{ order['order_number'] }}</p>
+        <p><strong>Customer Name:</strong> {{ order['customer_name'] }}</p>
+        <p><strong>Phone:</strong> {{ order['phone'] }}</p>
+        <p><strong>Email:</strong> {{ order['email'] or '—' }}</p>
+        <p><strong>Table Number:</strong> {{ order['table_number'] }}</p>
+        <p><strong>Special Instructions:</strong> {{ order['special_instructions'] or 'None' }}</p>
+        <p><strong>Order Date:</strong> {{ order['created_at'] }}</p>
+      </div>
+    </div>
+
+    <div class="table-cafe p-3">
+      <h5 class="p-2">Ordered Items</h5>
+      <table class="table mb-0">
+        <thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr></thead>
+        <tbody>
+          {% for oi in order_items %}
+          <tr>
+            <td>{{ oi['item_name'] }}</td>
+            <td>{{ oi['quantity'] }}</td>
+            <td>₹{{ '%.0f' % oi['price'] }}</td>
+            <td>₹{{ '%.0f' % (oi['price'] * oi['quantity']) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="text-end fw-bold p-2 fs-5">Total: ₹{{ '%.0f' % order['total_amount'] }}</div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="form-card">
+      <h5 class="mb-3">Update Order Status</h5>
+      <p>Current status: <span class="status-badge status-{{ order['status'] }}">{{ order['status'] }}</span></p>
+      <form method="POST" action="{{ url_for('admin_update_order_status', order_id=order['id']) }}">
+        <div class="mb-3">
+          <select name="status" class="form-select">
+            {% for status in statuses %}
+            <option value="{{ status }}" {% if order['status'] == status %}selected{% endif %}>{{ status }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="btn-cafe w-100">Update Status</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

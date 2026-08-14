@@ -1,0 +1,46 @@
+{% extends "admin/admin_base.html" %}
+{% block title %}Manage Menu - CafeHub Admin{% endblock %}
+{% block admin_content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 style="color:var(--coffee-brown); font-weight:800;">Manage Menu</h2>
+  <a href="{{ url_for('admin_add_menu') }}" class="btn-cafe">+ Add Menu Item</a>
+</div>
+
+<div class="table-cafe p-3">
+  <table class="table mb-0 align-middle">
+    <thead>
+      <tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Availability</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td style="width:60px;"><img src="{{ url_for('static', filename='images/' ~ item['image']) }}" style="width:50px;height:50px;border-radius:8px;"></td>
+        <td>{{ item['name'] }}</td>
+        <td>{{ item['category'] }}</td>
+        <td>₹{{ '%.0f' % item['price'] }}</td>
+        <td>
+          <form method="POST" action="{{ url_for('admin_toggle_menu', item_id=item['id']) }}">
+            {% if item['available'] %}
+              <button type="submit" class="status-badge status-Completed" style="border:none;">Available</button>
+            {% else %}
+              <button type="submit" class="status-badge status-Cancelled" style="border:none;">Unavailable</button>
+            {% endif %}
+          </form>
+        </td>
+        <td>
+          <a href="{{ url_for('admin_edit_menu', item_id=item['id']) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+          <form method="POST" action="{{ url_for('admin_delete_menu', item_id=item['id']) }}" class="d-inline"
+                onsubmit="return confirmDelete('{{ item['name'] }}');">
+            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="text-center text-muted py-4">No menu items yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

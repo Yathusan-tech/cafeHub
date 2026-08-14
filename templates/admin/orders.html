@@ -1,0 +1,37 @@
+{% extends "admin/admin_base.html" %}
+{% block title %}Manage Orders - CafeHub Admin{% endblock %}
+{% block admin_content %}
+
+<h2 class="mb-4" style="color:var(--coffee-brown); font-weight:800;">Manage Orders</h2>
+
+<div class="mb-4">
+  <a href="{{ url_for('admin_orders', status='All') }}" class="category-pill {% if selected_status == 'All' %}active{% endif %}">All</a>
+  {% for status in statuses %}
+  <a href="{{ url_for('admin_orders', status=status) }}" class="category-pill {% if selected_status == status %}active{% endif %}">{{ status }}</a>
+  {% endfor %}
+</div>
+
+<div class="table-cafe p-3">
+  <table class="table mb-0 align-middle">
+    <thead>
+      <tr><th>Order #</th><th>Customer</th><th>Table</th><th>Total</th><th>Date</th><th>Status</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for order in orders %}
+      <tr>
+        <td>{{ order['order_number'] }}</td>
+        <td>{{ order['customer_name'] }}</td>
+        <td>{{ order['table_number'] }}</td>
+        <td>₹{{ '%.0f' % order['total_amount'] }}</td>
+        <td>{{ order['created_at'] }}</td>
+        <td><span class="status-badge status-{{ order['status'] }}">{{ order['status'] }}</span></td>
+        <td><a href="{{ url_for('admin_order_details', order_id=order['id']) }}" class="btn btn-sm btn-outline-secondary">View Details</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7" class="text-center text-muted py-4">No orders found for this filter.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

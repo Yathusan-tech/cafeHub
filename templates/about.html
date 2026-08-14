@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}CafeHub - About Us{% endblock %}
+{% block content %}
+
+<section class="about-hero">
+  <div class="container container-narrow">
+    <h1>About CafeHub</h1>
+    <p>Brewing happiness, one cup at a time.</p>
+  </div>
+</section>
+
+<section>
+  <div class="container container-narrow">
+    <div class="row g-4 align-items-center">
+      <div class="col-md-6">
+        <h2 class="section-title text-md-start">Our Story</h2>
+        <p>CafeHub began as a small neighbourhood coffee corner with a simple dream — to serve genuinely great coffee and comfort food in a warm, welcoming space. Over time, our loyal customers became our extended family, and today CafeHub is proud to bring that same cozy experience online.</p>
+        <p>Every cup we brew and every dish we plate carries the same care and attention we started with on day one.</p>
+      </div>
+      <div class="col-md-6">
+        <div class="food-img-wrap" style="height:240px; border-radius:16px; overflow:hidden;">
+          <img src="{{ url_for('static', filename='images/cappuccino.svg') }}" alt="Our Story">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt-bg">
+  <div class="container container-narrow">
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="info-box">
+          <h4>🎯 Our Mission</h4>
+          <p>To serve high-quality coffee and food made from fresh ingredients, delivered with fast and friendly service, at prices everyone can enjoy.</p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="info-box">
+          <h4>🔭 Our Vision</h4>
+          <p>To become the neighbourhood's most loved cafe — a place where great taste, comfort, and community come together every single day.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container container-narrow">
+    <h2 class="section-title">Our Commitment to Quality</h2>
+    <div class="row g-4 text-center">
+      <div class="col-6 col-md-3">
+        <div class="feature-box"><div class="feature-icon">🌱</div><h6>Fresh Ingredients</h6></div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="feature-box"><div class="feature-icon">☕</div><h6>Quality Coffee</h6></div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="feature-box"><div class="feature-icon">⚡</div><h6>Fast Service</h6></div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="feature-box"><div class="feature-icon">🏡</div><h6>Comfortable Environment</h6></div>
+      </div>
+    </div>
+    <p class="text-center text-muted mt-4">All this, at prices that keep you coming back — because great cafe experiences shouldn't be expensive.</p>
+  </div>
+</section>
+
+{% endblock %}

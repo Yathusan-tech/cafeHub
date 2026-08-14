@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}CafeHub - Menu{% endblock %}
+{% block content %}
+
+<section class="pb-0" style="padding-top:40px;">
+  <div class="container container-narrow">
+    <h1 class="section-title">Our Menu</h1>
+    <p class="section-subtitle">Freshly made coffee, tea, snacks and desserts</p>
+
+    <div class="filter-bar">
+      <div class="row g-3 align-items-center">
+        <div class="col-md-4">
+          <input type="text" id="menuSearch" class="form-control" placeholder="🔍 Search menu items...">
+        </div>
+        <div class="col-md-4">
+          <select id="sortSelect" class="form-select">
+            <option value="default">Sort: Default</option>
+            <option value="low-high">Price: Low to High</option>
+            <option value="high-low">Price: High to Low</option>
+          </select>
+        </div>
+        <div class="col-md-4 text-md-end text-center">
+          <span class="text-muted small">Use categories below to filter</span>
+        </div>
+      </div>
+      <div class="text-center mt-3">
+        <button class="category-pill active" data-category="All">All</button>
+        {% for cat in categories %}
+        <button class="category-pill" data-category="{{ cat }}">{{ cat }}</button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div id="noResults" class="text-center text-muted mb-4" style="display:none;">
+      No items match your search. Try a different keyword or category.
+    </div>
+
+    <div class="row g-4" id="menuGrid">
+      {% for item in items %}
+      <div class="col-6 col-md-4 col-lg-3 menu-card-col"
+           data-name="{{ item['name'] }}"
+           data-category="{{ item['category'] }}"
+           data-price="{{ item['price'] }}"
+           data-index="{{ loop.index }}">
+        <div class="food-card">
+          <div class="food-img-wrap">
+            <img src="{{ url_for('static', filename='images/' ~ item['image']) }}" alt="{{ item['name'] }}">
+          </div>
+          <div class="food-body">
+            <div class="food-category">{{ item['category'] }}</div>
+            <h5>{{ item['name'] }}</h5>
+            <p class="desc">{{ item['description'] }}</p>
+            <div class="food-footer">
+              <span class="food-price">₹{{ '%.0f' % item['price'] }}</span>
+              {% if item['available'] %}
+                <form method="POST" action="{{ url_for('add_to_cart') }}">
+                  <input type="hidden" name="item_id" value="{{ item['id'] }}">
+                  <input type="hidden" name="quantity" value="1">
+                  <button type="submit" class="btn-cafe btn-sm">Add to Cart</button>
+                </form>
+              {% else %}
+                <span class="badge-unavailable">Unavailable</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

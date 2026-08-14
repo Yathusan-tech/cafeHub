@@ -1,0 +1,46 @@
+{% extends "admin/admin_base.html" %}
+{% block title %}Add Menu Item - CafeHub Admin{% endblock %}
+{% block admin_content %}
+
+<h2 class="mb-4" style="color:var(--coffee-brown); font-weight:800;">Add Menu Item</h2>
+
+<div class="form-card" style="max-width:640px;">
+  <form method="POST" action="{{ url_for('admin_add_menu') }}">
+    <div class="mb-3">
+      <label class="form-label">Item Name *</label>
+      <input type="text" name="name" class="form-control" value="{{ form.get('name', '') }}" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Description</label>
+      <textarea name="description" class="form-control" rows="3">{{ form.get('description', '') }}</textarea>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Category *</label>
+        <select name="category" class="form-select" required>
+          <option value="">-- Select Category --</option>
+          {% for cat in categories %}
+          <option value="{{ cat }}" {% if form.get('category') == cat %}selected{% endif %}>{{ cat }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Price (₹) *</label>
+        <input type="number" step="0.01" min="0" name="price" class="form-control" value="{{ form.get('price', '') }}" required>
+      </div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Image Filename</label>
+      <input type="text" name="image" class="form-control" placeholder="e.g. latte.svg (leave blank for default)" value="{{ form.get('image', '') }}">
+      <div class="form-text">Existing SVG placeholder images live in /static/images/. Leave blank to use a default placeholder.</div>
+    </div>
+    <div class="form-check mb-4">
+      <input type="checkbox" class="form-check-input" name="available" id="available" checked>
+      <label class="form-check-label" for="available">Available for ordering</label>
+    </div>
+    <button type="submit" class="btn-cafe">Save Item</button>
+    <a href="{{ url_for('admin_menu') }}" class="btn-cafe-outline ms-2">Cancel</a>
+  </form>
+</div>
+
+{% endblock %}

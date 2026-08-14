@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}CafeHub - Checkout{% endblock %}
+{% block content %}
+
+<section style="padding-top:40px;">
+  <div class="container container-narrow">
+    <h1 class="section-title">Checkout</h1>
+    <p class="section-subtitle">Just a few details and your order will be on its way</p>
+
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <div class="form-card">
+          <h4 class="mb-4">Customer Details</h4>
+          <form method="POST" action="{{ url_for('place_order') }}">
+            <div class="mb-3">
+              <label class="form-label">Full Name *</label>
+              <input type="text" name="customer_name" class="form-control" required>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Mobile Number *</label>
+                <input type="tel" name="phone" class="form-control" pattern="[0-9]{10,}" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Table Number *</label>
+              <input type="text" name="table_number" class="form-control" required>
+            </div>
+            <div class="mb-4">
+              <label class="form-label">Special Instructions</label>
+              <textarea name="special_instructions" class="form-control" rows="3" placeholder="E.g. less spicy, no onions..."></textarea>
+            </div>
+            <button type="submit" class="btn-accent w-100">Place Order</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="cart-summary">
+          <h4 class="mb-4">Order Summary</h4>
+          {% for item in items %}
+          <div class="d-flex justify-content-between mb-2">
+            <span>{{ item['name'] }} <span class="text-muted">x{{ item['quantity'] }}</span></span>
+            <span>₹{{ '%.0f' % item['subtotal'] }}</span>
+          </div>
+          {% endfor %}
+          <hr>
+          <div class="d-flex justify-content-between mb-2">
+            <span>Total Items</span>
+            <span class="fw-bold">{{ total_items }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="fw-bold">Grand Total</span>
+            <span class="fw-bold food-price">₹{{ '%.0f' % grand_total }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

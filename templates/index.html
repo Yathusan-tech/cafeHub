@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}CafeHub - Home{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <div class="container container-narrow">
+    <h1>Welcome to CafeHub</h1>
+    <p>Freshly brewed coffee, comforting bites, and a cozy corner to relax. Order online in seconds and skip the wait.</p>
+    <div class="hero-buttons">
+      <a href="{{ url_for('menu') }}" class="btn-cafe">Explore Menu</a>
+      <a href="{{ url_for('menu') }}" class="btn-accent">Order Now</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container container-narrow">
+    <h2 class="section-title">Our Cafe Story</h2>
+    <p class="section-subtitle">A cozy space brewing happiness, one cup at a time.</p>
+    <div class="row align-items-center g-4">
+      <div class="col-md-6">
+        <p>CafeHub started as a small neighbourhood coffee corner with one simple goal — serve genuinely good coffee and food, made fresh, served with care. Today we bring that same spirit online so you can order ahead, skip the queue, and enjoy your favourites at your own table.</p>
+      </div>
+      <div class="col-md-6">
+        <div class="food-img-wrap" style="height:220px; border-radius:16px; overflow:hidden;">
+          <img src="{{ url_for('static', filename='images/latte.svg') }}" alt="Cafe Introduction">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt-bg">
+  <div class="container container-narrow">
+    <h2 class="section-title">Featured Menu</h2>
+    <p class="section-subtitle">Handpicked favourites our customers love the most</p>
+    <div class="row g-4">
+      {% for item in featured_items %}
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="food-card">
+          <div class="food-img-wrap">
+            <img src="{{ url_for('static', filename='images/' ~ item['image']) }}" alt="{{ item['name'] }}">
+          </div>
+          <div class="food-body">
+            <div class="food-category">{{ item['category'] }}</div>
+            <h5>{{ item['name'] }}</h5>
+            <div class="food-footer">
+              <span class="food-price">₹{{ '%.0f' % item['price'] }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-5">
+      <a href="{{ url_for('menu') }}" class="btn-cafe-outline">View Full Menu</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container container-narrow">
+    <h2 class="section-title">Food Categories</h2>
+    <p class="section-subtitle">Something for every craving</p>
+    <div class="row g-4 text-center">
+      <div class="col-6 col-md-3">
+        <div class="feature-box"><div class="feature-icon">☕</div><h5>Coffee</h5></div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="feature-box"><div class="feature-icon">🍵</div><h5>Tea</h5></div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="feature-box"><div class="feature-icon">🥪</div><h5>Snacks</h5></div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="feature-box"><div class="feature-icon">🍰</div><h5>Desserts</h5></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt-bg">
+  <div class="container container-narrow">
+    <h2 class="section-title">Why Choose CafeHub</h2>
+    <p class="section-subtitle">What makes us your favourite corner cafe</p>
+    <div class="row g-4">
+      <div class="col-md-3 col-6">
+        <div class="feature-box">
+          <div class="feature-icon">🌱</div>
+          <h5>Fresh Ingredients</h5>
+          <p class="mb-0 small">Sourced daily for the best taste and quality.</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="feature-box">
+          <div class="feature-icon">⚡</div>
+          <h5>Fast Service</h5>
+          <p class="mb-0 small">Order online and get served without the wait.</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="feature-box">
+          <div class="feature-icon">💰</div>
+          <h5>Affordable Prices</h5>
+          <p class="mb-0 small">Great taste that doesn't break the bank.</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="feature-box">
+          <div class="feature-icon">🏡</div>
+          <h5>Cozy Environment</h5>
+          <p class="mb-0 small">A comfortable space to relax and unwind.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container container-narrow">
+    <h2 class="section-title">What Our Customers Say</h2>
+    <p class="section-subtitle">Real feedback from our regulars</p>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p>"Best cappuccino in town! The online ordering made it so easy to skip the line."</p>
+          <div class="customer-name">- Ananya R.</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p>"Loved the cozy vibe and the veg burger was amazing. Highly recommend CafeHub!"</p>
+          <div class="customer-name">- Rahul K.</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="testimonial-card">
+          <div class="stars">★★★★☆</div>
+          <p>"Great desserts and quick service. The cheesecake is a must try!"</p>
+          <div class="customer-name">- Sneha P.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

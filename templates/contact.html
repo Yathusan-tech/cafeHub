@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}CafeHub - Contact Us{% endblock %}
+{% block content %}
+
+<section class="contact-hero">
+  <div class="container container-narrow">
+    <h1>Get in Touch</h1>
+    <p>We'd love to hear from you</p>
+  </div>
+</section>
+
+<section>
+  <div class="container container-narrow">
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <div class="info-box mb-4">
+          <h5>📍 Address</h5>
+          <p class="mb-0">12 MG Road, Chennai, Tamil Nadu, India - 600001</p>
+        </div>
+        <div class="info-box mb-4">
+          <h5>📞 Phone &amp; Email</h5>
+          <p class="mb-1">+91 98765 43210</p>
+          <p class="mb-0">hello@cafehub.example</p>
+        </div>
+        <div class="info-box mb-4">
+          <h5>🕒 Opening Hours</h5>
+          <p class="mb-1">Monday - Sunday</p>
+          <p class="mb-0">8:00 AM - 10:00 PM</p>
+        </div>
+        <div class="map-placeholder">
+          🗺️ Map Placeholder - CafeHub Location
+        </div>
+      </div>
+
+      <div class="col-lg-7">
+        <div class="form-card">
+          <h4 class="mb-4">Send Us a Message</h4>
+          <form method="POST" action="{{ url_for('contact') }}">
+            <div class="mb-3">
+              <label class="form-label">Your Name *</label>
+              <input type="text" name="name" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Your Email *</label>
+              <input type="email" name="email" class="form-control" required>
+            </div>
+            <div class="mb-4">
+              <label class="form-label">Message *</label>
+              <textarea name="message" class="form-control" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn-cafe w-100">Send Message</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

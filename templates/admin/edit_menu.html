@@ -1,0 +1,44 @@
+{% extends "admin/admin_base.html" %}
+{% block title %}Edit Menu Item - CafeHub Admin{% endblock %}
+{% block admin_content %}
+
+<h2 class="mb-4" style="color:var(--coffee-brown); font-weight:800;">Edit Menu Item</h2>
+
+<div class="form-card" style="max-width:640px;">
+  <form method="POST" action="{{ url_for('admin_edit_menu', item_id=item['id']) }}">
+    <div class="mb-3">
+      <label class="form-label">Item Name *</label>
+      <input type="text" name="name" class="form-control" value="{{ item['name'] }}" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Description</label>
+      <textarea name="description" class="form-control" rows="3">{{ item['description'] }}</textarea>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Category *</label>
+        <select name="category" class="form-select" required>
+          {% for cat in categories %}
+          <option value="{{ cat }}" {% if item['category'] == cat %}selected{% endif %}>{{ cat }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Price (₹) *</label>
+        <input type="number" step="0.01" min="0" name="price" class="form-control" value="{{ item['price'] }}" required>
+      </div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Image Filename</label>
+      <input type="text" name="image" class="form-control" value="{{ item['image'] }}">
+    </div>
+    <div class="form-check mb-4">
+      <input type="checkbox" class="form-check-input" name="available" id="available" {% if item['available'] %}checked{% endif %}>
+      <label class="form-check-label" for="available">Available for ordering</label>
+    </div>
+    <button type="submit" class="btn-cafe">Update Item</button>
+    <a href="{{ url_for('admin_menu') }}" class="btn-cafe-outline ms-2">Cancel</a>
+  </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "admin/admin_base.html" %}
+{% block title %}Admin Dashboard - CafeHub{% endblock %}
+{% block admin_content %}
+
+<h2 class="mb-1" style="color:var(--coffee-brown); font-weight:800;">Dashboard</h2>
+<p class="text-muted mb-4">Welcome back, {{ session.get('admin_username', 'admin') }}! Here's how CafeHub is doing.</p>
+
+<div class="row g-4 mb-4">
+  <div class="col-md-4 col-6">
+    <div class="dashboard-card">
+      <div class="stat-icon">🍽️</div>
+      <div class="stat-value">{{ total_menu_items }}</div>
+      <div class="stat-label">Total Menu Items</div>
+    </div>
+  </div>
+  <div class="col-md-4 col-6">
+    <div class="dashboard-card">
+      <div class="stat-icon">🧾</div>
+      <div class="stat-value">{{ total_orders }}</div>
+      <div class="stat-label">Total Orders</div>
+    </div>
+  </div>
+  <div class="col-md-4 col-6">
+    <div class="dashboard-card">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-value">{{ pending_orders }}</div>
+      <div class="stat-label">Pending Orders</div>
+    </div>
+  </div>
+  <div class="col-md-4 col-6">
+    <div class="dashboard-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-value">{{ completed_orders }}</div>
+      <div class="stat-label">Completed Orders</div>
+    </div>
+  </div>
+  <div class="col-md-4 col-6">
+    <div class="dashboard-card">
+      <div class="stat-icon">💰</div>
+      <div class="stat-value">₹{{ '%.0f' % total_sales }}</div>
+      <div class="stat-label">Total Sales</div>
+    </div>
+  </div>
+  <div class="col-md-4 col-6">
+    <div class="dashboard-card">
+      <div class="stat-icon">⚙️</div>
+      <a href="{{ url_for('admin_add_menu') }}" class="btn-cafe btn-sm d-block mb-2 text-center">Add Menu Item</a>
+      <a href="{{ url_for('admin_orders') }}" class="btn-cafe-outline btn-sm d-block text-center">View Orders</a>
+    </div>
+  </div>
+</div>
+
+<div class="table-cafe p-3">
+  <h5 class="p-2">Recent Orders</h5>
+  <table class="table mb-0">
+    <thead>
+      <tr><th>Order #</th><th>Customer</th><th>Table</th><th>Total</th><th>Status</th><th>Date</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for order in recent_orders %}
+      <tr>
+        <td>{{ order['order_number'] }}</td>
+        <td>{{ order['customer_name'] }}</td>
+        <td>{{ order['table_number'] }}</td>
+        <td>₹{{ '%.0f' % order['total_amount'] }}</td>
+        <td><span class="status-badge status-{{ order['status'] }}">{{ order['status'] }}</span></td>
+        <td>{{ order['created_at'] }}</td>
+        <td><a href="{{ url_for('admin_order_details', order_id=order['id']) }}" class="btn btn-sm btn-outline-secondary">View</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7" class="text-center text-muted py-4">No orders yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
