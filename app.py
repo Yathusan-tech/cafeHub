@@ -307,9 +307,19 @@ def inject_cart_count():
 def index():
     """Homepage: shows featured menu items."""
     db = get_db()
-    featured_items = db.execute(
-        "SELECT * FROM menu_items WHERE available = 1 ORDER BY RANDOM() LIMIT 6"
-    ).fetchall()
+    featured_items = db.execute("""
+        SELECT * FROM menu_items 
+        WHERE available = 1 
+        ORDER BY CASE 
+            WHEN name = 'Cappuccino' THEN 1
+            WHEN name IN ('Cold Mocha', 'Mocha') THEN 2
+            WHEN name IN ('Classic Burger', 'Veg Burger') THEN 3
+            WHEN name IN ('Creamy Pasta', 'Pasta') THEN 4
+            WHEN name IN ('Choco Lava Cake', 'Chocolate Cake') THEN 5
+            ELSE 6
+        END, id ASC
+        LIMIT 5
+    """).fetchall()
     return render_template("index.html", featured_items=featured_items)
 
 

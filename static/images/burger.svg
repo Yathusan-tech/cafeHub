@@ -1,12 +1,136 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 220" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
   <defs>
-    <linearGradient id="g13" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#a56b3b" stop-opacity="0.9"/>
-      <stop offset="100%" stop-color="#2c1a10" stop-opacity="0.95"/>
+    <!-- Background Gradient -->
+    <linearGradient id="bgBurger" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4b2e1e"/>
+      <stop offset="50%" stop-color="#3b2214"/>
+      <stop offset="100%" stop-color="#2c1a10"/>
     </linearGradient>
+
+    <!-- Warm Glow -->
+    <radialGradient id="glowBurger" cx="50%" cy="55%" r="45%">
+      <stop offset="0%" stop-color="#d99a44" stop-opacity="0.35"/>
+      <stop offset="60%" stop-color="#6f4e37" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#2c1a10" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Bun Gradient -->
+    <linearGradient id="bunTop" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e8a863"/>
+      <stop offset="50%" stop-color="#d68c45"/>
+      <stop offset="100%" stop-color="#a65e23"/>
+    </linearGradient>
+    <linearGradient id="bunBottom" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#d68c45"/>
+      <stop offset="100%" stop-color="#9a521c"/>
+    </linearGradient>
+
+    <!-- Patty Gradient -->
+    <linearGradient id="pattyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#542e18"/>
+      <stop offset="100%" stop-color="#2a1408"/>
+    </linearGradient>
+
+    <!-- Cheese Gradient -->
+    <linearGradient id="cheeseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffcc00"/>
+      <stop offset="100%" stop-color="#f5a623"/>
+    </linearGradient>
+
+    <!-- French Fries Gradient -->
+    <linearGradient id="fryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffd54f"/>
+      <stop offset="100%" stop-color="#f57f17"/>
+    </linearGradient>
+
+    <filter id="shadowBurger" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#150b06" flood-opacity="0.6"/>
+    </filter>
   </defs>
-  <rect width="300" height="220" rx="16" fill="url(#g13)"/>
-  <circle cx="150" cy="90" r="46" fill="#ffffff" fill-opacity="0.12"/>
-  <text x="150" y="108" font-size="56" text-anchor="middle" dominant-baseline="middle">🍔</text>
-  <text x="150" y="185" font-size="18" font-family="'Segoe UI', Arial, sans-serif" font-weight="600" fill="#fff5e6" text-anchor="middle">Veg Burger</text>
+
+  <!-- Background Canvas -->
+  <rect width="400" height="300" rx="16" fill="url(#bgBurger)"/>
+  <rect width="400" height="300" rx="16" fill="url(#glowBurger)"/>
+
+  <!-- Subtle Rings -->
+  <circle cx="200" cy="165" r="135" fill="none" stroke="#d99a44" stroke-opacity="0.07" stroke-width="2"/>
+  <circle cx="200" cy="165" r="115" fill="none" stroke="#ffffff" stroke-opacity="0.05" stroke-width="1.5" stroke-dasharray="6,6"/>
+
+  <!-- Burger Plate / Surface Shadow -->
+  <ellipse cx="170" cy="255" rx="90" ry="18" fill="#180c06" opacity="0.7" filter="url(#shadowBurger)"/>
+  <ellipse cx="305" cy="250" rx="55" ry="14" fill="#180c06" opacity="0.6" filter="url(#shadowBurger)"/>
+
+  <!-- French Fries Stack (Right Side) -->
+  <g transform="translate(260, 160)" filter="url(#shadowBurger)">
+    <!-- Fry Box / Paper Holder -->
+    <path d="M 15 85 L 75 85 L 85 45 L 5 45 Z" fill="#e2d2bc" opacity="0.85"/>
+    <path d="M 5 45 Q 45 60 85 45" stroke="#c8b296" stroke-width="2" fill="none"/>
+    <!-- Fries -->
+    <rect x="18" y="0" width="8" height="60" rx="2" fill="url(#fryGrad)" transform="rotate(-15 18 0)"/>
+    <rect x="30" y="-10" width="9" height="70" rx="2" fill="url(#fryGrad)" transform="rotate(-6 30 -10)"/>
+    <rect x="42" y="-18" width="8.5" height="75" rx="2" fill="url(#fryGrad)" transform="rotate(4 42 -18)"/>
+    <rect x="54" y="-8" width="9" height="68" rx="2" fill="url(#fryGrad)" transform="rotate(16 54 -8)"/>
+    <rect x="65" y="5" width="8" height="55" rx="2" fill="url(#fryGrad)" transform="rotate(26 65 5)"/>
+    <!-- Front Overlapping Fries -->
+    <rect x="22" y="15" width="8" height="50" rx="2" fill="url(#fryGrad)" transform="rotate(8 22 15)"/>
+    <rect x="40" y="10" width="8.5" height="55" rx="2" fill="url(#fryGrad)" transform="rotate(-12 40 10)"/>
+    <rect x="50" y="20" width="8" height="48" rx="2" fill="url(#fryGrad)" transform="rotate(2 50 20)"/>
+  </g>
+
+  <!-- Burger (Left / Center) -->
+  <g filter="url(#shadowBurger)">
+    <!-- Bottom Bun -->
+    <path d="M 85 220 C 85 242 100 248 170 248 C 240 248 255 242 255 220 Z" fill="url(#bunBottom)"/>
+    
+    <!-- Crispy Lettuce Leaf -->
+    <path d="M 75 215 Q 90 205 110 216 Q 135 202 165 215 Q 195 203 225 217 Q 250 205 265 216 L 255 225 L 85 225 Z" fill="#4caf50"/>
+    <path d="M 80 216 Q 120 226 160 218 Q 200 228 260 217" stroke="#81c784" stroke-width="2" fill="none"/>
+
+    <!-- Grilled Beef / Veggie Patty -->
+    <rect x="80" y="185" width="180" height="28" rx="8" fill="url(#pattyGrad)"/>
+    <!-- Grill marks -->
+    <line x1="105" y1="190" x2="115" y2="208" stroke="#180b03" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+    <line x1="140" y1="190" x2="150" y2="208" stroke="#180b03" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+    <line x1="175" y1="190" x2="185" y2="208" stroke="#180b03" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+    <line x1="210" y1="190" x2="220" y2="208" stroke="#180b03" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+
+    <!-- Melted Cheddar Cheese Layer (Dripping down) -->
+    <path d="M 82 185 L 258 185 L 250 196 L 220 208 L 205 194 L 175 210 L 155 193 L 125 206 L 90 195 Z" fill="url(#cheeseGrad)"/>
+
+    <!-- Tomato Slice -->
+    <rect x="86" y="168" width="168" height="15" rx="6" fill="#e53935"/>
+    <rect x="92" y="171" width="40" height="8" rx="3" fill="#ef5350"/>
+    <rect x="145" y="171" width="45" height="8" rx="3" fill="#ef5350"/>
+    <rect x="202" y="171" width="42" height="8" rx="3" fill="#ef5350"/>
+
+    <!-- Onion Rings -->
+    <ellipse cx="140" cy="166" rx="42" ry="5" fill="none" stroke="#ba68c8" stroke-width="3.5" opacity="0.8"/>
+    <ellipse cx="195" cy="165" rx="40" ry="5" fill="none" stroke="#ba68c8" stroke-width="3.5" opacity="0.8"/>
+
+    <!-- Top Sesame Bun Dome -->
+    <path d="M 80 162 C 80 88 120 72 170 72 C 220 72 260 88 260 162 Z" fill="url(#bunTop)"/>
+    <!-- Bun Highlight -->
+    <path d="M 115 100 C 135 84 185 84 210 94" stroke="#ffeb3b" stroke-width="4" stroke-linecap="round" opacity="0.4" fill="none"/>
+
+    <!-- Sesame Seeds on Bun -->
+    <g fill="#fff9c4" opacity="0.95">
+      <!-- Top row -->
+      <ellipse cx="150" cy="95" rx="3" ry="1.8" transform="rotate(20 150 95)"/>
+      <ellipse cx="172" cy="90" rx="3" ry="1.8" transform="rotate(-15 172 90)"/>
+      <ellipse cx="195" cy="94" rx="3" ry="1.8" transform="rotate(35 195 94)"/>
+      <!-- Mid row -->
+      <ellipse cx="125" cy="115" rx="3" ry="1.8" transform="rotate(-30 125 115)"/>
+      <ellipse cx="145" cy="112" rx="3" ry="1.8" transform="rotate(10 145 112)"/>
+      <ellipse cx="168" cy="110" rx="3" ry="1.8" transform="rotate(-20 168 110)"/>
+      <ellipse cx="190" cy="114" rx="3" ry="1.8" transform="rotate(15 190 114)"/>
+      <ellipse cx="215" cy="118" rx="3" ry="1.8" transform="rotate(-35 215 118)"/>
+      <!-- Lower row -->
+      <ellipse cx="110" cy="135" rx="3" ry="1.8" transform="rotate(15 110 135)"/>
+      <ellipse cx="138" cy="132" rx="3" ry="1.8" transform="rotate(-10 138 132)"/>
+      <ellipse cx="160" cy="130" rx="3" ry="1.8" transform="rotate(25 160 130)"/>
+      <ellipse cx="185" cy="132" rx="3" ry="1.8" transform="rotate(-15 185 132)"/>
+      <ellipse cx="210" cy="134" rx="3" ry="1.8" transform="rotate(20 210 134)"/>
+      <ellipse cx="232" cy="138" rx="3" ry="1.8" transform="rotate(-25 232 138)"/>
+    </g>
+  </g>
 </svg>

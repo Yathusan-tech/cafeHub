@@ -1,12 +1,110 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 220" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
   <defs>
-    <linearGradient id="g14" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#d99a44" stop-opacity="0.9"/>
-      <stop offset="100%" stop-color="#2c1a10" stop-opacity="0.95"/>
+    <!-- Background Gradient -->
+    <linearGradient id="bgPasta" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4b2e1e"/>
+      <stop offset="50%" stop-color="#3b2214"/>
+      <stop offset="100%" stop-color="#2c1a10"/>
     </linearGradient>
+
+    <!-- Warm Glow -->
+    <radialGradient id="glowPasta" cx="50%" cy="55%" r="45%">
+      <stop offset="0%" stop-color="#d99a44" stop-opacity="0.35"/>
+      <stop offset="60%" stop-color="#6f4e37" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#2c1a10" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Ceramic Bowl Gradient -->
+    <linearGradient id="bowlGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fdfbf7"/>
+      <stop offset="70%" stop-color="#f3e4d0"/>
+      <stop offset="100%" stop-color="#d8c2a7"/>
+    </linearGradient>
+
+    <!-- Cream Sauce Pasta Swirl Gradient -->
+    <linearGradient id="sauceGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff8e7"/>
+      <stop offset="50%" stop-color="#f5e1a4"/>
+      <stop offset="100%" stop-color="#d4aa50"/>
+    </linearGradient>
+
+    <filter id="shadowPasta" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#150b06" flood-opacity="0.6"/>
+    </filter>
   </defs>
-  <rect width="300" height="220" rx="16" fill="url(#g14)"/>
-  <circle cx="150" cy="90" r="46" fill="#ffffff" fill-opacity="0.12"/>
-  <text x="150" y="108" font-size="56" text-anchor="middle" dominant-baseline="middle">🍝</text>
-  <text x="150" y="185" font-size="18" font-family="'Segoe UI', Arial, sans-serif" font-weight="600" fill="#fff5e6" text-anchor="middle">Pasta</text>
+
+  <!-- Background Canvas -->
+  <rect width="400" height="300" rx="16" fill="url(#bgPasta)"/>
+  <rect width="400" height="300" rx="16" fill="url(#glowPasta)"/>
+
+  <!-- Subtle Rings -->
+  <circle cx="200" cy="165" r="135" fill="none" stroke="#d99a44" stroke-opacity="0.07" stroke-width="2"/>
+  <circle cx="200" cy="165" r="115" fill="none" stroke="#ffffff" stroke-opacity="0.05" stroke-width="1.5" stroke-dasharray="6,6"/>
+
+  <!-- Bowl Shadow -->
+  <ellipse cx="200" cy="245" rx="125" ry="24" fill="#180c06" opacity="0.7" filter="url(#shadowPasta)"/>
+
+  <!-- Ceramic Bowl Outer -->
+  <ellipse cx="200" cy="205" rx="122" ry="42" fill="url(#bowlGrad)" filter="url(#shadowPasta)"/>
+  <ellipse cx="200" cy="200" rx="116" ry="36" fill="#fdfbf7"/>
+  <ellipse cx="200" cy="198" rx="108" ry="32" fill="#e8d8c2"/>
+
+  <!-- Creamy Pasta Nest -->
+  <g filter="url(#shadowPasta)">
+    <!-- Base Pasta Mass -->
+    <ellipse cx="200" cy="190" rx="88" ry="26" fill="url(#sauceGrad)"/>
+
+    <!-- Fettuccine / Spaghetti Ribbons -->
+    <!-- Ribbon 1 -->
+    <path d="M 130 185 Q 160 160 200 175 Q 240 190 270 178" fill="none" stroke="#fce49f" stroke-width="9" stroke-linecap="round"/>
+    <path d="M 130 185 Q 160 160 200 175 Q 240 190 270 178" fill="none" stroke="#fff9e6" stroke-width="5" stroke-linecap="round"/>
+
+    <!-- Ribbon 2 -->
+    <path d="M 140 198 Q 180 215 220 195 Q 250 180 265 195" fill="none" stroke="#e6ba55" stroke-width="8" stroke-linecap="round"/>
+    <path d="M 140 198 Q 180 215 220 195 Q 250 180 265 195" fill="none" stroke="#fdf0cd" stroke-width="4.5" stroke-linecap="round"/>
+
+    <!-- Ribbon 3 (Center Swirl Peak) -->
+    <path d="M 160 175 Q 185 142 205 145 Q 230 148 245 168" fill="none" stroke="#fce49f" stroke-width="8.5" stroke-linecap="round"/>
+    <path d="M 160 175 Q 185 142 205 145 Q 230 148 245 168" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+
+    <!-- Top Ribbon Swirl Nest -->
+    <ellipse cx="200" cy="155" rx="34" ry="18" fill="url(#sauceGrad)"/>
+    <path d="M 175 155 Q 195 135 220 145 Q 228 158 205 162 Q 185 165 178 152" fill="none" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round"/>
+    <path d="M 188 146 Q 205 138 215 148" fill="none" stroke="#d4aa50" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- Cream Sauce Gloss Highlights -->
+    <ellipse cx="180" cy="180" rx="14" ry="5" fill="#ffffff" opacity="0.6"/>
+    <ellipse cx="225" cy="172" rx="12" ry="4" fill="#ffffff" opacity="0.6"/>
+    <ellipse cx="200" cy="195" rx="18" ry="6" fill="#ffffff" opacity="0.6"/>
+  </g>
+
+  <!-- Grated Parmesan Cheese & Black Pepper Flakes -->
+  <g fill="#241208">
+    <!-- Black pepper flakes -->
+    <circle cx="175" cy="165" r="1.5"/>
+    <circle cx="190" cy="150" r="1.8"/>
+    <circle cx="210" cy="148" r="1.6"/>
+    <circle cx="225" cy="162" r="1.5"/>
+    <circle cx="165" cy="182" r="1.4"/>
+    <circle cx="185" cy="190" r="1.7"/>
+    <circle cx="215" cy="185" r="1.5"/>
+    <circle cx="240" cy="178" r="1.3"/>
+    <circle cx="195" cy="172" r="1.8"/>
+  </g>
+
+  <!-- Fresh Basil / Parsley Leaves on Top -->
+  <!-- Leaf 1 (Left) -->
+  <g transform="translate(185, 140) rotate(-25)">
+    <path d="M 0 0 C -8 -10 -4 -18 0 -22 C 4 -18 8 -10 0 0 Z" fill="#388e3c"/>
+    <path d="M 0 0 L 0 -18" stroke="#81c784" stroke-width="1"/>
+  </g>
+  <!-- Leaf 2 (Right) -->
+  <g transform="translate(210, 138) rotate(30)">
+    <path d="M 0 0 C -7 -8 -3 -15 0 -18 C 3 -15 7 -8 0 0 Z" fill="#2e7d32"/>
+    <path d="M 0 0 L 0 -15" stroke="#81c784" stroke-width="1"/>
+  </g>
+  <!-- Leaf 3 (Center Small) -->
+  <g transform="translate(198, 145) rotate(5)">
+    <path d="M 0 0 C -5 -6 -2 -12 0 -14 C 2 -12 5 -6 0 0 Z" fill="#4caf50"/>
+  </g>
 </svg>
