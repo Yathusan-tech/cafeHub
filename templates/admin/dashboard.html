@@ -6,46 +6,60 @@
 <p class="text-muted mb-4">Welcome back, {{ session.get('admin_username', 'admin') }}! Here's how CafeHub is doing.</p>
 
 <div class="row g-4 mb-4">
-  <div class="col-md-4 col-6">
+  <div class="col-lg-3 col-md-4 col-6">
     <div class="dashboard-card">
       <div class="stat-icon">🍽️</div>
       <div class="stat-value">{{ total_menu_items }}</div>
       <div class="stat-label">Total Menu Items</div>
     </div>
   </div>
-  <div class="col-md-4 col-6">
+  <div class="col-lg-3 col-md-4 col-6">
     <div class="dashboard-card">
       <div class="stat-icon">🧾</div>
       <div class="stat-value">{{ total_orders }}</div>
       <div class="stat-label">Total Orders</div>
     </div>
   </div>
-  <div class="col-md-4 col-6">
-    <div class="dashboard-card">
-      <div class="stat-icon">⏳</div>
-      <div class="stat-value">{{ pending_orders }}</div>
-      <div class="stat-label">Pending Orders</div>
-    </div>
-  </div>
-  <div class="col-md-4 col-6">
-    <div class="dashboard-card">
-      <div class="stat-icon">✅</div>
-      <div class="stat-value">{{ completed_orders }}</div>
-      <div class="stat-label">Completed Orders</div>
-    </div>
-  </div>
-  <div class="col-md-4 col-6">
+  <div class="col-lg-3 col-md-4 col-6">
     <div class="dashboard-card">
       <div class="stat-icon">💰</div>
       <div class="stat-value">₹{{ '%.0f' % total_sales }}</div>
       <div class="stat-label">Total Sales</div>
     </div>
   </div>
-  <div class="col-md-4 col-6">
+  <div class="col-lg-3 col-md-4 col-6">
     <div class="dashboard-card">
-      <div class="stat-icon">⚙️</div>
-      <a href="{{ url_for('admin_add_menu') }}" class="btn-cafe btn-sm d-block mb-2 text-center">Add Menu Item</a>
-      <a href="{{ url_for('admin_orders') }}" class="btn-cafe-outline btn-sm d-block text-center">View Orders</a>
+      <div class="stat-icon">⏳</div>
+      <div class="stat-value">{{ pending_orders }}</div>
+      <div class="stat-label">Pending Orders</div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-4 col-6">
+    <div class="dashboard-card">
+      <div class="stat-icon">👨‍🍳</div>
+      <div class="stat-value">{{ preparing_orders }}</div>
+      <div class="stat-label">Preparing Orders</div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-4 col-6">
+    <div class="dashboard-card">
+      <div class="stat-icon">🔔</div>
+      <div class="stat-value">{{ ready_orders }}</div>
+      <div class="stat-label">Ready Orders</div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-4 col-6">
+    <div class="dashboard-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-value">{{ completed_orders }}</div>
+      <div class="stat-label">Completed Orders</div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-4 col-6">
+    <div class="dashboard-card">
+      <div class="stat-icon">❌</div>
+      <div class="stat-value">{{ cancelled_orders }}</div>
+      <div class="stat-label">Cancelled Orders</div>
     </div>
   </div>
 </div>

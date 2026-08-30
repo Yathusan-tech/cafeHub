@@ -21,9 +21,9 @@
           </div>
           <form method="POST" action="{{ url_for('update_cart') }}" class="qty-control">
             <input type="hidden" name="item_id" value="{{ item['id'] }}">
-            <button type="submit" name="action" value="decrease" class="qty-btn">-</button>
+            <button type="submit" name="action" value="decrease" class="qty-btn" aria-label="Decrease quantity of {{ item['name'] }}">-</button>
             <span class="fw-bold">{{ item['quantity'] }}</span>
-            <button type="submit" name="action" value="increase" class="qty-btn">+</button>
+            <button type="submit" name="action" value="increase" class="qty-btn" aria-label="Increase quantity of {{ item['name'] }}">+</button>
           </form>
           <div class="text-end" style="min-width:100px;">
             <div class="fw-bold">₹{{ '%.0f' % item['subtotal'] }}</div>

@@ -17,7 +17,8 @@
     <a class="side-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}" href="{{ url_for('admin_dashboard') }}">📊 Dashboard</a>
     <a class="side-link {% if request.endpoint in ['admin_menu','admin_add_menu','admin_edit_menu'] %}active{% endif %}" href="{{ url_for('admin_menu') }}">🍽️ Manage Menu</a>
     <a class="side-link {% if request.endpoint == 'admin_add_menu' %}active{% endif %}" href="{{ url_for('admin_add_menu') }}">➕ Add Menu Item</a>
-    <a class="side-link {% if request.endpoint in ['admin_orders','admin_order_details'] %}active{% endif %}" href="{{ url_for('admin_orders') }}">🧾 Manage Orders</a>
+    <a class="side-link {% if request.endpoint == 'admin_orders' or request.endpoint == 'admin_order_details' %}active{% endif %}" href="{{ url_for('admin_orders') }}">🧾 Manage Orders</a>
+    <a class="side-link {% if request.endpoint == 'admin_settings' %}active{% endif %}" href="{{ url_for('admin_settings') }}">⚙️ Settings</a>
     <a class="side-link" href="{{ url_for('index') }}" target="_blank">🌐 View Website</a>
     <a class="side-link" href="{{ url_for('admin_logout') }}">🚪 Logout</a>
   </div>

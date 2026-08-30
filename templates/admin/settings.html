@@ -1,0 +1,43 @@
+{% extends "admin/admin_base.html" %}
+{% block title %}Settings - CafeHub Admin{% endblock %}
+{% block admin_content %}
+
+<h2 class="mb-4" style="color:var(--coffee-brown); font-weight:800;">Admin Settings</h2>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="form-card">
+      <h4 class="mb-3">Change Admin Password</h4>
+      <p class="text-muted small mb-4">Ensure your account uses a strong password.</p>
+      
+      <form method="POST" action="{{ url_for('admin_settings') }}">
+        <div class="mb-3">
+          <label class="form-label">Current Password *</label>
+          <input type="password" name="current_password" class="form-control" required autocomplete="current-password">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">New Password *</label>
+          <input type="password" name="new_password" class="form-control" minlength="6" required autocomplete="new-password">
+          <div class="form-text">Minimum 6 characters.</div>
+        </div>
+        <div class="mb-4">
+          <label class="form-label">Confirm New Password *</label>
+          <input type="password" name="confirm_password" class="form-control" minlength="6" required autocomplete="new-password">
+        </div>
+        <button type="submit" class="btn-cafe">Update Password</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="dashboard-card">
+      <h4 class="mb-3">System Information</h4>
+      <p><strong>Admin Account:</strong> {{ session.get('admin_username', 'admin') }}</p>
+      <p><strong>Session Protection:</strong> Active (Secure Hashing)</p>
+      <p><strong>Database:</strong> SQLite with Foreign Key Integrity</p>
+      <p><strong>Deployment Target:</strong> Render (Gunicorn)</p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

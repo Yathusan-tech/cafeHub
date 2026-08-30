@@ -25,19 +25,20 @@ from flask import (
     Flask, render_template, request, redirect,
     url_for, session, flash, g, abort
 )
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # ---------------------------------------------------------------------------
 # App configuration
 # ---------------------------------------------------------------------------
 app = Flask(__name__)
-app.secret_key = "cafehub_secret_key_change_in_production"  # used to sign session cookies
+app.secret_key = os.environ.get("SECRET_KEY", "cafehub_secret_key_change_in_production")
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-DATABASE = os.path.join(BASE_DIR, "database.db")
+DATABASE = os.environ.get("DATABASE_PATH", os.path.join(BASE_DIR, "database.db"))
 
-# Default admin credentials (for demonstration purposes only)
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "admin123"
+# Default admin credentials (configurable via environment variables)
+ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "admin")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
 
 # Valid order statuses (a Python list, used for validation and dropdowns)
 ORDER_STATUSES = ["Pending", "Preparing", "Ready", "Completed", "Cancelled"]
@@ -171,16 +172,47 @@ def init_db():
     else:
         print("Menu items already exist. Skipping sample data insertion.")
 
+    # ---- admins table ----
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS admins (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL UNIQUE,
+            password_hash TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        )
+    """)
+    conn.commit()
+
+    # ---- Seed default admin account with hashed password if empty ----
+    cursor.execute("SELECT COUNT(*) FROM admins")
+    admin_count = cursor.fetchone()[0]
+    if admin_count == 0:
+        default_user = os.environ.get("ADMIN_USERNAME", "admin")
+        default_pass = os.environ.get("ADMIN_PASSWORD", "admin123")
+        cursor.execute("""
+            INSERT INTO admins (username, password_hash, created_at)
+            VALUES (?, ?, ?)
+        """, (default_user, generate_password_hash(default_pass), datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        conn.commit()
+        print(f"Default admin '{default_user}' created with secure password hash.")
+
     conn.close()
+
+
+# Initialize database automatically on startup
+try:
+    init_db()
+except Exception as _e:
+    pass
 
 
 # ---------------------------------------------------------------------------
 # Utility functions
 # ---------------------------------------------------------------------------
 def generate_order_number():
-    """Generates a unique order number like CH-20260814-XXXX."""
+    """Generates a unique order number like CH-20260827-XXXX."""
     date_part = datetime.now().strftime("%Y%m%d")
-    random_part = "".join(random.choices(string.digits, k=4))
+    random_part = "".join(random.choices(string.digits + string.ascii_uppercase, k=4))
     return f"CH-{date_part}-{random_part}"
 
 
@@ -191,7 +223,7 @@ def get_cart():
     Using session keeps the cart tied to each visitor's browser
     without needing a login.
     """
-    if "cart" not in session:
+    if "cart" not in session or not isinstance(session["cart"], dict):
         session["cart"] = {}
     return session["cart"]
 
@@ -420,7 +452,9 @@ def place_order():
     errors = []
     if not customer_name:
         errors.append("Full name is required.")
-    if not phone or not phone.isdigit() or len(phone) < 10:
+    
+    phone_clean = phone.replace(" ", "").replace("-", "").replace("+91", "").replace("+", "")
+    if not phone_clean or not phone_clean.isdigit() or len(phone_clean) < 10:
         errors.append("A valid 10-digit mobile number is required.")
     if not table_number:
         errors.append("Table number is required.")
@@ -430,32 +464,42 @@ def place_order():
             flash(e, "error")
         return redirect(url_for("checkout"))
 
-    # ---- Save order to database (try/except for robust error handling) ----
+    # ---- Save order to database (try/except with retry for robust error handling) ----
+    db = get_db()
     order_number = generate_order_number()
     created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    db = get_db()
-    try:
-        cursor = db.execute("""
-            INSERT INTO orders
-                (order_number, customer_name, phone, email, table_number,
-                 special_instructions, total_amount, status, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending', ?)
-        """, (order_number, customer_name, phone, email, table_number,
-              special_instructions, grand_total, created_at))
+    order_saved = False
+    for _ in range(3):
+        try:
+            cursor = db.execute("""
+                INSERT INTO orders
+                    (order_number, customer_name, phone, email, table_number,
+                     special_instructions, total_amount, status, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending', ?)
+            """, (order_number, customer_name, phone, email, table_number,
+                  special_instructions, grand_total, created_at))
 
-        order_id = cursor.lastrowid
+            order_id = cursor.lastrowid
 
-        # Save each cart item as an order_item row
-        for item in items:
-            db.execute("""
-                INSERT INTO order_items (order_id, menu_item_id, item_name, quantity, price)
-                VALUES (?, ?, ?, ?, ?)
-            """, (order_id, item["id"], item["name"], item["quantity"], item["price"]))
+            # Save each cart item as an order_item row
+            for item in items:
+                db.execute("""
+                    INSERT INTO order_items (order_id, menu_item_id, item_name, quantity, price)
+                    VALUES (?, ?, ?, ?, ?)
+                """, (order_id, item["id"], item["name"], item["quantity"], item["price"]))
 
-        db.commit()
-    except sqlite3.Error:
-        db.rollback()
+            db.commit()
+            order_saved = True
+            break
+        except sqlite3.IntegrityError:
+            db.rollback()
+            order_number = generate_order_number()
+        except sqlite3.Error:
+            db.rollback()
+            break
+
+    if not order_saved:
         flash("Something went wrong while placing your order. Please try again.", "error")
         return redirect(url_for("checkout"))
 
@@ -512,14 +556,32 @@ def contact():
 # ---------------------------------------------------------------------------
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
+    """Secure Admin Portal Login with password hash verification."""
+    if session.get("admin_logged_in"):
+        return redirect(url_for("admin_dashboard"))
+
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
 
-        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+        db = get_db()
+        admin = db.execute("SELECT * FROM admins WHERE username = ?", (username,)).fetchone()
+
+        if admin and check_password_hash(admin["password_hash"], password):
             session["admin_logged_in"] = True
-            session["admin_username"] = username
-            flash("Welcome back, admin!", "success")
+            session["admin_username"] = admin["username"]
+            session["admin_id"] = admin["id"]
+            flash(f"Welcome back, {admin['username']}!", "success")
+            return redirect(url_for("admin_dashboard"))
+        elif not admin and username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+            # Fallback for first-time environment admin setup
+            new_hash = generate_password_hash(ADMIN_PASSWORD)
+            db.execute("INSERT OR REPLACE INTO admins (username, password_hash, created_at) VALUES (?, ?, ?)",
+                       (ADMIN_USERNAME, new_hash, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+            db.commit()
+            session["admin_logged_in"] = True
+            session["admin_username"] = ADMIN_USERNAME
+            flash(f"Welcome back, {ADMIN_USERNAME}!", "success")
             return redirect(url_for("admin_dashboard"))
         else:
             flash("Invalid username or password.", "error")
@@ -529,10 +591,51 @@ def admin_login():
 
 @app.route("/admin/logout")
 def admin_logout():
+    """Destroys admin session upon logout."""
     session.pop("admin_logged_in", None)
     session.pop("admin_username", None)
+    session.pop("admin_id", None)
     flash("You have been logged out.", "success")
     return redirect(url_for("admin_login"))
+
+
+@app.route("/admin/settings", methods=["GET", "POST"])
+@login_required
+def admin_settings():
+    """Allows administrators to update their password securely."""
+    if request.method == "POST":
+        current_password = request.form.get("current_password", "")
+        new_password = request.form.get("new_password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        if not current_password or not new_password or not confirm_password:
+            flash("All password fields are required.", "error")
+            return render_template("admin/settings.html")
+
+        if new_password != confirm_password:
+            flash("New passwords do not match.", "error")
+            return render_template("admin/settings.html")
+
+        if len(new_password) < 6:
+            flash("New password must be at least 6 characters.", "error")
+            return render_template("admin/settings.html")
+
+        db = get_db()
+        admin_user = session.get("admin_username", ADMIN_USERNAME)
+        admin = db.execute("SELECT * FROM admins WHERE username = ?", (admin_user,)).fetchone()
+
+        if not admin or not check_password_hash(admin["password_hash"], current_password):
+            flash("Current password is incorrect.", "error")
+            return render_template("admin/settings.html")
+
+        new_hash = generate_password_hash(new_password)
+        db.execute("UPDATE admins SET password_hash = ? WHERE id = ?", (new_hash, admin["id"]))
+        db.commit()
+
+        flash("Password updated successfully.", "success")
+        return redirect(url_for("admin_dashboard"))
+
+    return render_template("admin/settings.html")
 
 
 @app.route("/admin/dashboard")
@@ -545,8 +648,17 @@ def admin_dashboard():
     pending_orders = db.execute(
         "SELECT COUNT(*) FROM orders WHERE status = 'Pending'"
     ).fetchone()[0]
+    preparing_orders = db.execute(
+        "SELECT COUNT(*) FROM orders WHERE status = 'Preparing'"
+    ).fetchone()[0]
+    ready_orders = db.execute(
+        "SELECT COUNT(*) FROM orders WHERE status = 'Ready'"
+    ).fetchone()[0]
     completed_orders = db.execute(
         "SELECT COUNT(*) FROM orders WHERE status = 'Completed'"
+    ).fetchone()[0]
+    cancelled_orders = db.execute(
+        "SELECT COUNT(*) FROM orders WHERE status = 'Cancelled'"
     ).fetchone()[0]
     total_sales_row = db.execute(
         "SELECT SUM(total_amount) FROM orders WHERE status != 'Cancelled'"
@@ -562,7 +674,10 @@ def admin_dashboard():
         total_menu_items=total_menu_items,
         total_orders=total_orders,
         pending_orders=pending_orders,
+        preparing_orders=preparing_orders,
+        ready_orders=ready_orders,
         completed_orders=completed_orders,
+        cancelled_orders=cancelled_orders,
         total_sales=total_sales,
         recent_orders=recent_orders
     )
@@ -682,9 +797,14 @@ def admin_delete_menu(item_id):
     if item is None:
         flash("Menu item not found.", "error")
     else:
-        db.execute("DELETE FROM menu_items WHERE id = ?", (item_id,))
-        db.commit()
-        flash(f"'{item['name']}' deleted from the menu.", "success")
+        try:
+            db.execute("UPDATE order_items SET menu_item_id = NULL WHERE menu_item_id = ?", (item_id,))
+            db.execute("DELETE FROM menu_items WHERE id = ?", (item_id,))
+            db.commit()
+            flash(f"'{item['name']}' deleted from the menu.", "success")
+        except sqlite3.Error:
+            db.rollback()
+            flash("Could not delete menu item due to a database error.", "error")
 
     return redirect(url_for("admin_menu"))
 

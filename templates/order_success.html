@@ -29,21 +29,23 @@
       <hr class="my-4">
 
       <h5 class="text-start mb-3">Ordered Items</h5>
-      <table class="table table-cafe text-start">
-        <thead>
-          <tr><th>Item</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr>
-        </thead>
-        <tbody>
-          {% for oi in order_items %}
-          <tr>
-            <td>{{ oi['item_name'] }}</td>
-            <td>{{ oi['quantity'] }}</td>
-            <td>₹{{ '%.0f' % oi['price'] }}</td>
-            <td>₹{{ '%.0f' % (oi['price'] * oi['quantity']) }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="table table-cafe text-start">
+          <thead>
+            <tr><th>Item</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr>
+          </thead>
+          <tbody>
+            {% for oi in order_items %}
+            <tr>
+              <td>{{ oi['item_name'] }}</td>
+              <td>{{ oi['quantity'] }}</td>
+              <td>₹{{ '%.0f' % oi['price'] }}</td>
+              <td>₹{{ '%.0f' % (oi['price'] * oi['quantity']) }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
 
       <div class="text-end fw-bold fs-5 mb-4">
         Total Amount: ₹{{ '%.0f' % order['total_amount'] }}
