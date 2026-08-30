@@ -1,12 +1,137 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 220" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
   <defs>
-    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#6f4e37" stop-opacity="0.9"/>
-      <stop offset="100%" stop-color="#2c1a10" stop-opacity="0.95"/>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGradCap" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4b2e1e"/>
+      <stop offset="50%" stop-color="#3b2214"/>
+      <stop offset="100%" stop-color="#2c1a10"/>
     </linearGradient>
+
+    <!-- Warm Glow -->
+    <radialGradient id="warmGlowCap" cx="50%" cy="55%" r="45%">
+      <stop offset="0%" stop-color="#d99a44" stop-opacity="0.35"/>
+      <stop offset="60%" stop-color="#6f4e37" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#2c1a10" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Cup Ceramic Gradient -->
+    <linearGradient id="cupGradCap" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#fdfbf7"/>
+      <stop offset="25%" stop-color="#ffffff"/>
+      <stop offset="75%" stop-color="#f5ede0"/>
+      <stop offset="100%" stop-color="#e2d2bc"/>
+    </linearGradient>
+
+    <!-- Saucer Gradient -->
+    <linearGradient id="saucerGradCap" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="60%" stop-color="#f3e4d0"/>
+      <stop offset="100%" stop-color="#d8c2a7"/>
+    </linearGradient>
+
+    <!-- Coffee Crema Gradient -->
+    <radialGradient id="cremaGradCap" cx="45%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#a9785c"/>
+      <stop offset="35%" stop-color="#6f4e37"/>
+      <stop offset="85%" stop-color="#4b2e1e"/>
+      <stop offset="100%" stop-color="#321b0e"/>
+    </radialGradient>
+
+    <!-- Foam Dome Gradient -->
+    <radialGradient id="foamDome" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="60%" stop-color="#fff5e6"/>
+      <stop offset="100%" stop-color="#eedcc6"/>
+    </radialGradient>
+
+    <!-- Bean Gradient -->
+    <linearGradient id="beanGradCap" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5a331c"/>
+      <stop offset="100%" stop-color="#2c160a"/>
+    </linearGradient>
+
+    <!-- Drop Shadow Filter -->
+    <filter id="shadowCap" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#150b06" flood-opacity="0.6"/>
+    </filter>
+    <filter id="cupShadowCap" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#24130a" flood-opacity="0.4"/>
+    </filter>
   </defs>
-  <rect width="300" height="220" rx="16" fill="url(#g1)"/>
-  <circle cx="150" cy="90" r="46" fill="#ffffff" fill-opacity="0.12"/>
-  <text x="150" y="108" font-size="56" text-anchor="middle" dominant-baseline="middle">☕</text>
-  <text x="150" y="185" font-size="18" font-family="'Segoe UI', Arial, sans-serif" font-weight="600" fill="#fff5e6" text-anchor="middle">Cappuccino</text>
+
+  <!-- Background Canvas -->
+  <rect width="400" height="300" rx="16" fill="url(#bgGradCap)"/>
+  <rect width="400" height="300" rx="16" fill="url(#warmGlowCap)"/>
+
+  <!-- Subtle Background Rings / Coffee Art Watermark -->
+  <circle cx="200" cy="165" r="135" fill="none" stroke="#d99a44" stroke-opacity="0.07" stroke-width="2"/>
+  <circle cx="200" cy="165" r="115" fill="none" stroke="#ffffff" stroke-opacity="0.05" stroke-width="1.5" stroke-dasharray="6,6"/>
+
+  <!-- Steam Whisps -->
+  <g opacity="0.65">
+    <path d="M 175 105 Q 165 75 180 50 T 175 22" fill="none" stroke="#fff5e6" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+    <path d="M 200 100 Q 215 70 198 42 T 205 16" fill="none" stroke="#fff5e6" stroke-width="3.5" stroke-linecap="round" opacity="0.75"/>
+    <path d="M 225 105 Q 235 78 220 52 T 225 24" fill="none" stroke="#fff5e6" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+  </g>
+
+  <!-- Saucer Shadow -->
+  <ellipse cx="200" cy="236" rx="120" ry="24" fill="#180c06" opacity="0.6" filter="url(#shadowCap)"/>
+
+  <!-- Saucer Base -->
+  <ellipse cx="200" cy="230" rx="116" ry="22" fill="url(#saucerGradCap)"/>
+  <ellipse cx="200" cy="229" rx="108" ry="18" fill="#fdfbf7"/>
+  <ellipse cx="200" cy="229" rx="72" ry="11" fill="#e2d2bc" opacity="0.7"/>
+
+  <!-- Cup Handle -->
+  <path d="M 260 142 C 305 142 305 198 255 198" fill="none" stroke="url(#cupGradCap)" stroke-width="14" stroke-linecap="round" filter="url(#cupShadowCap)"/>
+  <path d="M 260 142 C 298 142 298 198 255 198" fill="none" stroke="#ffffff" stroke-width="4" opacity="0.6"/>
+
+  <!-- Cup Body -->
+  <path d="M 132 135 C 134 195 152 225 200 225 C 248 225 266 195 268 135 Z" fill="url(#cupGradCap)" filter="url(#cupShadowCap)"/>
+  
+  <!-- Cup Highlight Reflection -->
+  <path d="M 144 140 C 146 185 158 212 185 218 C 168 212 154 188 152 140 Z" fill="#ffffff" opacity="0.5"/>
+
+  <!-- Cup Top Rim -->
+  <ellipse cx="200" cy="135" rx="68" ry="20" fill="url(#cupGradCap)"/>
+  <ellipse cx="200" cy="135" rx="64" ry="17" fill="#ebdcc8"/>
+
+  <!-- Coffee Crema Rim -->
+  <ellipse cx="200" cy="135" rx="61" ry="15" fill="url(#cremaGradCap)"/>
+
+  <!-- Thick Cappuccino Foam Dome -->
+  <ellipse cx="200" cy="133" rx="55" ry="13.5" fill="url(#foamDome)"/>
+  <ellipse cx="200" cy="131" rx="44" ry="10" fill="#ffffff" opacity="0.9"/>
+
+  <!-- Cocoa / Cinnamon Sprinkles on Foam -->
+  <g fill="#4b2e1e" opacity="0.75">
+    <circle cx="192" cy="130" r="1.5"/>
+    <circle cx="198" cy="128" r="1.8"/>
+    <circle cx="205" cy="129" r="1.4"/>
+    <circle cx="188" cy="133" r="1.6"/>
+    <circle cx="195" cy="134" r="2"/>
+    <circle cx="203" cy="133" r="1.8"/>
+    <circle cx="210" cy="132" r="1.3"/>
+    <circle cx="190" cy="127" r="1.2"/>
+    <circle cx="202" cy="126" r="1.5"/>
+    <circle cx="197" cy="137" r="1.4"/>
+  </g>
+
+  <!-- Coffee Beans on the Table -->
+  <g transform="translate(90, 240) rotate(-25)" filter="url(#cupShadowCap)">
+    <ellipse cx="0" cy="0" rx="14" ry="9" fill="url(#beanGradCap)"/>
+    <path d="M -11 0 Q 0 -3 11 0 Q 0 3 -11 0" fill="#1c0d05" opacity="0.8"/>
+  </g>
+  <g transform="translate(72, 232) rotate(40)" filter="url(#cupShadowCap)">
+    <ellipse cx="0" cy="0" rx="11" ry="7" fill="url(#beanGradCap)"/>
+    <path d="M -9 0 Q 0 -2 9 0 Q 0 2 -9 0" fill="#1c0d05" opacity="0.8"/>
+  </g>
+  <g transform="translate(322, 238) rotate(35)" filter="url(#cupShadowCap)">
+    <ellipse cx="0" cy="0" rx="13" ry="8" fill="url(#beanGradCap)"/>
+    <path d="M -10 0 Q 0 -2.5 10 0 Q 0 2.5 -10 0" fill="#1c0d05" opacity="0.8"/>
+  </g>
+  <g transform="translate(338, 246) rotate(-15)" filter="url(#cupShadowCap)">
+    <ellipse cx="0" cy="0" rx="10" ry="6.5" fill="url(#beanGradCap)"/>
+    <path d="M -8 0 Q 0 -2 8 0 Q 0 2 -8 0" fill="#1c0d05" opacity="0.8"/>
+  </g>
 </svg>
