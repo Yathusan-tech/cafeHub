@@ -49,6 +49,7 @@
               <span class="food-price">₹{{ '%.0f' % item['price'] }}</span>
               {% if item['available'] %}
                 <form method="POST" action="{{ url_for('add_to_cart') }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                   <input type="hidden" name="item_id" value="{{ item['id'] }}">
                   <input type="hidden" name="quantity" value="1">
                   <button type="submit" class="btn-cafe btn-sm">🛒 Add to Cart</button>

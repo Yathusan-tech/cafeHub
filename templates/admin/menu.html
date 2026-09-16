@@ -21,6 +21,7 @@
         <td>₹{{ '%.0f' % item['price'] }}</td>
         <td>
           <form method="POST" action="{{ url_for('admin_toggle_menu', item_id=item['id']) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             {% if item['available'] %}
               <button type="submit" class="status-badge status-Completed" style="border:none;">Available</button>
             {% else %}
@@ -32,6 +33,7 @@
           <a href="{{ url_for('admin_edit_menu', item_id=item['id']) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
           <form method="POST" action="{{ url_for('admin_delete_menu', item_id=item['id']) }}" class="d-inline"
                 onsubmit="return confirmDelete('{{ item['name'] }}');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
           </form>
         </td>

@@ -20,7 +20,10 @@
     <a class="side-link {% if request.endpoint == 'admin_orders' or request.endpoint == 'admin_order_details' %}active{% endif %}" href="{{ url_for('admin_orders') }}">🧾 Manage Orders</a>
     <a class="side-link {% if request.endpoint == 'admin_settings' %}active{% endif %}" href="{{ url_for('admin_settings') }}">⚙️ Settings</a>
     <a class="side-link" href="{{ url_for('index') }}" target="_blank">🌐 View Website</a>
-    <a class="side-link" href="{{ url_for('admin_logout') }}">🚪 Logout</a>
+    <form method="POST" action="{{ url_for('admin_logout') }}" class="m-0 p-0">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="side-link">🚪 Logout</button>
+    </form>
   </div>
 
   <div class="col-lg-10">

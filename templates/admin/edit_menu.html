@@ -6,6 +6,7 @@
 
 <div class="form-card" style="max-width:640px;">
   <form method="POST" action="{{ url_for('admin_edit_menu', item_id=item['id']) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="mb-3">
       <label class="form-label">Item Name *</label>
       <input type="text" name="name" class="form-control" value="{{ item['name'] }}" required>

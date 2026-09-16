@@ -20,6 +20,7 @@
             <div class="text-muted">Unit Price: ₹{{ '%.0f' % item['price'] }}</div>
           </div>
           <form method="POST" action="{{ url_for('update_cart') }}" class="qty-control">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="item_id" value="{{ item['id'] }}">
             <button type="submit" name="action" value="decrease" class="qty-btn" aria-label="Decrease quantity of {{ item['name'] }}">-</button>
             <span class="fw-bold">{{ item['quantity'] }}</span>
@@ -29,6 +30,7 @@
             <div class="fw-bold">₹{{ '%.0f' % item['subtotal'] }}</div>
           </div>
           <form method="POST" action="{{ url_for('remove_from_cart') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="item_id" value="{{ item['id'] }}">
             <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
           </form>
@@ -36,6 +38,7 @@
         {% endfor %}
 
         <form method="POST" action="{{ url_for('clear_cart') }}" class="mt-3">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <button type="submit" class="btn-cafe-outline">Clear Entire Cart</button>
         </form>
       </div>

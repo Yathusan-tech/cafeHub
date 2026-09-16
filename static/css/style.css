@@ -509,17 +509,26 @@ label.form-label { font-weight: 600; color: var(--coffee-brown); }
   display: block;
 }
 
-.admin-sidebar a.side-link {
+.admin-sidebar a.side-link,
+.admin-sidebar button.side-link {
   display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
   padding: 12px 24px;
   color: var(--beige);
+  font-family: inherit;
+  font-size: 1rem;
   font-weight: 500;
   border-left: 4px solid transparent;
   transition: var(--transition);
+  cursor: pointer;
 }
 
 .admin-sidebar a.side-link:hover,
-.admin-sidebar a.side-link.active {
+.admin-sidebar a.side-link.active,
+.admin-sidebar button.side-link:hover {
   background-color: rgba(255,255,255,0.06);
   border-left-color: var(--accent);
   color: var(--white);

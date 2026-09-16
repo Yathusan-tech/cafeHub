@@ -46,6 +46,7 @@
       <h5 class="mb-3">Update Order Status</h5>
       <p>Current status: <span class="status-badge status-{{ order['status'] }}">{{ order['status'] }}</span></p>
       <form method="POST" action="{{ url_for('admin_update_order_status', order_id=order['id']) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="mb-3">
           <select name="status" class="form-select">
             {% for status in statuses %}

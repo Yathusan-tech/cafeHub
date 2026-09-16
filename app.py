@@ -18,27 +18,66 @@ import sqlite3
 import os
 import random
 import string
+import secrets
 from datetime import datetime
 from functools import wraps
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 from flask import (
     Flask, render_template, request, redirect,
     url_for, session, flash, g, abort
 )
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.exceptions import HTTPException
+from flask_wtf.csrf import CSRFProtect, CSRFError
 
 # ---------------------------------------------------------------------------
 # App configuration
 # ---------------------------------------------------------------------------
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "cafehub_secret_key_change_in_production")
+
+# Environment detection
+FLASK_ENV = os.environ.get("FLASK_ENV", "").lower()
+ENVIRONMENT = os.environ.get("ENVIRONMENT", "").lower()
+IS_PRODUCTION = (
+    FLASK_ENV == "production" or
+    ENVIRONMENT == "production" or
+    os.environ.get("RENDER") is not None
+)
+
+# SECRET_KEY handling (require in production, ephemeral random in dev fallback)
+raw_secret = os.environ.get("SECRET_KEY")
+if raw_secret:
+    app.secret_key = raw_secret
+elif IS_PRODUCTION:
+    raise RuntimeError(
+        "CRITICAL CONFIGURATION ERROR: SECRET_KEY environment variable is not set. "
+        "A secure random secret key is required in production."
+    )
+else:
+    # For local development only: generate an ephemeral random key per process.
+    # Avoids hardcoding any reusable secret in source code.
+    app.secret_key = secrets.token_hex(32)
+
+# Session and cookie security
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_COOKIE_SECURE"] = IS_PRODUCTION
+
+# Initialize CSRF Protection across all POST/state-changing requests
+csrf = CSRFProtect(app)
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 DATABASE = os.environ.get("DATABASE_PATH", os.path.join(BASE_DIR, "database.db"))
 
-# Default admin credentials (configurable via environment variables)
-ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "admin")
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
+# Admin credentials configured via environment variables (no hardcoded defaults in code)
+ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
 
 # Valid order statuses (a Python list, used for validation and dropdowns)
 ORDER_STATUSES = ["Pending", "Preparing", "Ready", "Completed", "Cancelled"]
@@ -183,18 +222,21 @@ def init_db():
     """)
     conn.commit()
 
-    # ---- Seed default admin account with hashed password if empty ----
+    # ---- Seed default admin account with hashed password if empty and configured ----
     cursor.execute("SELECT COUNT(*) FROM admins")
     admin_count = cursor.fetchone()[0]
     if admin_count == 0:
-        default_user = os.environ.get("ADMIN_USERNAME", "admin")
-        default_pass = os.environ.get("ADMIN_PASSWORD", "admin123")
-        cursor.execute("""
-            INSERT INTO admins (username, password_hash, created_at)
-            VALUES (?, ?, ?)
-        """, (default_user, generate_password_hash(default_pass), datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-        conn.commit()
-        print(f"Default admin '{default_user}' created with secure password hash.")
+        default_user = os.environ.get("ADMIN_USERNAME", "admin").strip() or "admin"
+        default_pass = os.environ.get("ADMIN_PASSWORD")
+        if default_pass:
+            cursor.execute("""
+                INSERT INTO admins (username, password_hash, created_at)
+                VALUES (?, ?, ?)
+            """, (default_user, generate_password_hash(default_pass), datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+            conn.commit()
+            print(f"Admin account '{default_user}' created with secure password hash.")
+        else:
+            print("Notice: Set ADMIN_PASSWORD in environment to initialize the admin account.")
 
     conn.close()
 
@@ -300,6 +342,22 @@ def inject_cart_count():
     return {"cart_count": count}
 
 
+@app.after_request
+def set_security_headers(response):
+    """Applies defense-in-depth HTTP security headers."""
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    return response
+
+
+@app.errorhandler(CSRFError)
+def handle_csrf_error(e):
+    """Gracefully catches CSRF verification failures without crashing or leaking details."""
+    flash("Your session expired or security verification failed. Please try again.", "error")
+    return redirect(request.referrer or url_for("index"))
+
+
 # ---------------------------------------------------------------------------
 # Customer-facing routes
 # ---------------------------------------------------------------------------
@@ -346,8 +404,14 @@ def add_to_cart():
     item_id = request.form.get("item_id")
     quantity = request.form.get("quantity", "1")
 
+    try:
+        item_id_int = int(item_id)
+    except (ValueError, TypeError):
+        flash("Invalid menu item.", "error")
+        return redirect(url_for("menu"))
+
     db = get_db()
-    menu_item = db.execute("SELECT * FROM menu_items WHERE id = ?", (item_id,)).fetchone()
+    menu_item = db.execute("SELECT * FROM menu_items WHERE id = ?", (item_id_int,)).fetchone()
 
     if menu_item is None:
         flash("Invalid menu item.", "error")
@@ -361,12 +425,15 @@ def add_to_cart():
         quantity = int(quantity)
         if quantity < 1:
             quantity = 1
-    except ValueError:
+        elif quantity > 50:
+            quantity = 50
+    except (ValueError, TypeError):
         quantity = 1
 
     cart = get_cart()
-    current_qty = int(cart.get(item_id, 0))
-    cart[item_id] = current_qty + quantity
+    str_id = str(item_id_int)
+    current_qty = int(cart.get(str_id, 0))
+    cart[str_id] = min(current_qty + quantity, 100)
     session["cart"] = cart
     session.modified = True
 
@@ -387,19 +454,29 @@ def update_cart():
     item_id = request.form.get("item_id")
     action = request.form.get("action")  # "increase" or "decrease"
 
-    cart = get_cart()
+    try:
+        item_id_int = int(item_id)
+    except (ValueError, TypeError):
+        return redirect(url_for("cart"))
 
-    if item_id in cart:
-        qty = int(cart[item_id])
+    cart = get_cart()
+    str_id = str(item_id_int)
+
+    if str_id in cart:
+        try:
+            qty = int(cart[str_id])
+        except (ValueError, TypeError):
+            qty = 1
+
         if action == "increase":
-            qty += 1
+            qty = min(qty + 1, 100)
         elif action == "decrease":
             qty -= 1
 
         if qty <= 0:
-            cart.pop(item_id, None)
+            cart.pop(str_id, None)
         else:
-            cart[item_id] = qty
+            cart[str_id] = qty
 
         session["cart"] = cart
         session.modified = True
@@ -411,8 +488,14 @@ def update_cart():
 def remove_from_cart():
     """Removes a single item entirely from the cart."""
     item_id = request.form.get("item_id")
+    try:
+        item_id_int = int(item_id)
+        str_id = str(item_id_int)
+    except (ValueError, TypeError):
+        str_id = str(item_id) if item_id else ""
+
     cart = get_cart()
-    cart.pop(item_id, None)
+    cart.pop(str_id, None)
     session["cart"] = cart
     session.modified = True
     flash("Item removed from cart.", "success")
@@ -453,18 +536,18 @@ def place_order():
         return redirect(url_for("menu"))
 
     # ---- Collect and validate form fields ----
-    customer_name = request.form.get("customer_name", "").strip()
-    phone = request.form.get("phone", "").strip()
-    email = request.form.get("email", "").strip()
-    table_number = request.form.get("table_number", "").strip()
-    special_instructions = request.form.get("special_instructions", "").strip()
+    customer_name = request.form.get("customer_name", "").strip()[:100]
+    phone = request.form.get("phone", "").strip()[:20]
+    email = request.form.get("email", "").strip()[:120]
+    table_number = request.form.get("table_number", "").strip()[:20]
+    special_instructions = request.form.get("special_instructions", "").strip()[:500]
 
     errors = []
     if not customer_name:
         errors.append("Full name is required.")
     
     phone_clean = phone.replace(" ", "").replace("-", "").replace("+91", "").replace("+", "")
-    if not phone_clean or not phone_clean.isdigit() or len(phone_clean) < 10:
+    if not phone_clean or not phone_clean.isdigit() or len(phone_clean) < 10 or len(phone_clean) > 15:
         errors.append("A valid 10-digit mobile number is required.")
     if not table_number:
         errors.append("Table number is required.")
@@ -577,31 +660,22 @@ def admin_login():
         db = get_db()
         admin = db.execute("SELECT * FROM admins WHERE username = ?", (username,)).fetchone()
 
+        # Verify authentication strictly against the stored Werkzeug password hash
         if admin and check_password_hash(admin["password_hash"], password):
             session["admin_logged_in"] = True
             session["admin_username"] = admin["username"]
             session["admin_id"] = admin["id"]
             flash(f"Welcome back, {admin['username']}!", "success")
             return redirect(url_for("admin_dashboard"))
-        elif not admin and username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
-            # Fallback for first-time environment admin setup
-            new_hash = generate_password_hash(ADMIN_PASSWORD)
-            db.execute("INSERT OR REPLACE INTO admins (username, password_hash, created_at) VALUES (?, ?, ?)",
-                       (ADMIN_USERNAME, new_hash, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-            db.commit()
-            session["admin_logged_in"] = True
-            session["admin_username"] = ADMIN_USERNAME
-            flash(f"Welcome back, {ADMIN_USERNAME}!", "success")
-            return redirect(url_for("admin_dashboard"))
-        else:
-            flash("Invalid username or password.", "error")
+
+        flash("Invalid username or password.", "error")
 
     return render_template("admin/login.html")
 
 
-@app.route("/admin/logout")
+@app.route("/admin/logout", methods=["POST"])
 def admin_logout():
-    """Destroys admin session upon logout."""
+    """Destroys admin session upon logout (POST-only with CSRF protection)."""
     session.pop("admin_logged_in", None)
     session.pop("admin_username", None)
     session.pop("admin_id", None)
@@ -626,8 +700,8 @@ def admin_settings():
             flash("New passwords do not match.", "error")
             return render_template("admin/settings.html")
 
-        if len(new_password) < 6:
-            flash("New password must be at least 6 characters.", "error")
+        if len(new_password) < 10:
+            flash("New password must be at least 10 characters.", "error")
             return render_template("admin/settings.html")
 
         db = get_db()
@@ -721,10 +795,14 @@ def admin_add_menu():
             price = float(price)
             if price <= 0:
                 errors.append("Price must be greater than zero.")
+            elif price > 100000:
+                errors.append("Price cannot exceed 100,000.")
         except ValueError:
             errors.append("Price must be a valid number.")
             price = 0
 
+        if image:
+            image = os.path.basename(image)
         if not image:
             image = "placeholder.svg"
 
@@ -773,10 +851,14 @@ def admin_edit_menu(item_id):
             price = float(price)
             if price <= 0:
                 errors.append("Price must be greater than zero.")
+            elif price > 100000:
+                errors.append("Price cannot exceed 100,000.")
         except ValueError:
             errors.append("Price must be a valid number.")
             price = 0
 
+        if image:
+            image = os.path.basename(image)
         if not image:
             image = "placeholder.svg"
 
@@ -901,6 +983,17 @@ def not_found(e):
 
 @app.errorhandler(500)
 def server_error(e):
+    app.logger.error(f"Internal Server Error: {e}")
+    return render_template("500.html"), 500
+
+
+@app.errorhandler(Exception)
+def handle_unexpected_exception(e):
+    if isinstance(e, HTTPException):
+        return e
+    if app.debug:
+        raise e
+    app.logger.error(f"Unhandled Exception: {e}")
     return render_template("500.html"), 500
 
 
@@ -908,11 +1001,14 @@ def server_error(e):
 # App entry point
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
-    import os
-
     init_db()
+
+    debug_mode = (
+        os.environ.get("FLASK_DEBUG", "0").lower() in ("1", "true")
+    ) and not IS_PRODUCTION
 
     app.run(
         host="0.0.0.0",
-        port=int(os.environ.get("PORT", 5000))
+        port=int(os.environ.get("PORT", 5000)),
+        debug=debug_mode
     )
